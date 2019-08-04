@@ -7,6 +7,7 @@ public class Reciever{
   public int n, e;
 
   public Reciever(int p , int q, int e){
+    //p and q are large prime numbers
     this.p = p;
     this.q = q;
     // e must be relatively prime to (p-1) and (q-1) and (p-1)(q-1)
@@ -15,8 +16,9 @@ public class Reciever{
     // n pubic key = p * q
     this.n = p * q;
     //private key d -> e * d == 1 mod ((p-1)(q-1))
-    this.d = (CongruenceModulo(1, ((this.p-1)*(this.q-1))))/this.e;
+    this.d = (CongruenceModulo(1, ((this.p-1)*(this.q-1)), this.e))/this.e;
     System.out.println("Initialised Reciever with public key (n="+n+",e="+e+")");
+    System.out.println("Private key = " + this.d);
   }
 
   public int getN(){
@@ -26,14 +28,16 @@ public class Reciever{
     return this.e;
   }
 
-  public int CongruenceModulo(int b , int n){
+  public int CongruenceModulo(int b , int n, int e){
     // returns a in a == b mod n
     int k = 1;
     int a = (k * n) + b;
-    while((a % n) != (b % n)){
+    while((a % e != 0)){
+      //System.out.println("trying a = " + a + "a mod " + e + " = " + (a % e) + " a mod n " + a%n + " b mod n " + b%n);
       k++;
       a = (k * n) + b;
-      if(k == 10){return -1;} //threshold for k reached , quit
+    //  if(k == 10){return -1;} //threshold for k reached , quit
+
     }
     return a;
 
@@ -46,7 +50,8 @@ public class Reciever{
 
   public BigInteger decrypt(BigInteger Ciphertext){
     //Decryption -> M == C^d mod n
-    System.out.println("Decrypting message "+ Ciphertext + "^" + this.d + "mod" + this.n);
-    return Ciphertext.pow(this.d).mod(BigInteger.valueOf(this.n));
+    System.out.println("Decrypting ciphertext: "+ Ciphertext + " --> " +
+    Ciphertext + "^" + this.d + " mod " + this.n);
+    return (Ciphertext.pow(this.d)).mod(BigInteger.valueOf(this.n));
   }
 }
