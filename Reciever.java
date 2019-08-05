@@ -1,4 +1,5 @@
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 public class Reciever{
   //reciever class
@@ -18,7 +19,7 @@ public class Reciever{
     //private key d -> e * d == 1 mod ((p-1)(q-1))
     this.d = (CongruenceModulo(1, ((this.p-1)*(this.q-1)), this.e))/this.e;
     System.out.println("Initialised Reciever with public key (n="+n+",e="+e+")");
-    System.out.println("Private key = " + this.d);
+    System.out.println("Reciever Private key = " + this.d);
   }
 
   public int getN(){
@@ -53,5 +54,13 @@ public class Reciever{
     System.out.println("Decrypting ciphertext: "+ Ciphertext + " --> " +
     Ciphertext + "^" + this.d + " mod " + this.n);
     return (Ciphertext.pow(this.d)).mod(BigInteger.valueOf(this.n));
+  }
+
+  public String decryptString(BigInteger[] Ciphertext){
+    char[] message = new char[Ciphertext.length];
+    for (int x = 0; x < Ciphertext.length; x++) {
+      message[x] = (char)((decrypt(Ciphertext[x])).intValue());
+    }
+    return new String(message);
   }
 }

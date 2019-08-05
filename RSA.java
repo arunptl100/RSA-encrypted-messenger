@@ -1,4 +1,5 @@
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 public class RSA{
 
@@ -20,18 +21,20 @@ public class RSA{
     return (findGCD(a, b) == 1) ? true : false;
   }
 
+
   /*
   * p and q are large prime numbers
   * e must be relatively prime to (p-1) and (q-1) and (p-1)(q-1)
   * 1 < e < (p-1)(q-1)
   */
   public static void main(String[] args) {
-    System.out.println("====RSA encryption implemtation====");
+    System.out.println("====================RSA encryption implemtation====================");
+
     int p , q , e;
     p = 97;
     q = 101;
     e = 251;
-    int message = 450;
+    //int message = 450;
     if((relativelyPrime(e,(p-1))) && (relativelyPrime(e, (q-1))) && (relativelyPrime(e,((p-1)*(q-1)))) ){
       System.out.println("e meets the requirements");
     }else{
@@ -41,9 +44,22 @@ public class RSA{
     //public Reciever(int p , int q, int e)
     Reciever rcvr = new Reciever(p,q,e);
     Sender sender = new Sender(rcvr.getN(), rcvr.getE());
-    BigInteger cipherT = sender.encrypt(BigInteger.valueOf(message));
-    BigInteger decryptMess = rcvr.decrypt(cipherT);
-    System.out.println("Result of Decryption " + decryptMess);
 
+    String message = "hello world";
+    BigInteger[] cipherText = sender.encryptString(message);
+    System.out.println("Encrypted message " + message + " -> ");
+    for (int x = 0 ;x < cipherText.length ;x++ ) {
+      System.out.print(" " + cipherText[x]);
+    }System.out.println();
+    String decrypt = rcvr.decryptString(cipherText);
+    System.out.println("Result of decryption --> " + decrypt );
+    // String ciphertext = sender.encryptString(message);
+    // System.out.println("Encrypted message " + message + " -> " + ciphertext);
+    // String decryptMessage = rcvr.decryptString(ciphertext);
+    // System.out.println("Decrypted ciphertext " + ciphertext + " -> " + decryptMessage);
+    // BigInteger cipherT = sender.encrypt(BigInteger.valueOf(message));
+    // BigInteger decryptMess = rcvr.decrypt(cipherT);
+    //System.out.println("Result of Decryption " + decryptMess);
+    System.out.println("===================================================================");
   }
 }
