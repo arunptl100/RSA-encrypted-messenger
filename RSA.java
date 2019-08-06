@@ -30,12 +30,13 @@ public class RSA{
   public static void main(String[] args) {
     System.out.println("====================RSA encryption implemtation====================");
 
-    int p , q , e;
+    int p, q, e;
     p = 97;
     q = 101;
     e = 251;
     //int message = 450;
-    if((relativelyPrime(e,(p-1))) && (relativelyPrime(e, (q-1))) && (relativelyPrime(e,((p-1)*(q-1)))) ){
+    if((relativelyPrime(e,(p-1))) && (relativelyPrime(e, (q-1)))
+    && (e > 1) && (e < (p-1)*(q-1)) && (relativelyPrime(e,((p-1)*(q-1)))) ){
       System.out.println("e meets the requirements");
     }else{
       System.out.println("e does NOT the requirements");
