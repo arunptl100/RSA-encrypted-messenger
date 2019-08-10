@@ -28,6 +28,7 @@ public class RSA{
   * 1 < e < (p-1)(q-1)
   */
   public static void main(String[] args) {
+    client cl = new client("localhost",25565);
     System.out.println("====================RSA encryption implemtation====================");
 
     int p, q, e;
