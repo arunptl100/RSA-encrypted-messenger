@@ -16,7 +16,7 @@ public class server{
       Socket clientSocket;
       try{
         clientSocket = serverSocket.accept();
-        System.out.println("new client connected " + clientSocket);
+        System.out.println("new client connected " + clientSocket + " id = " + id);
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         // create a new thread object
