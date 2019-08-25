@@ -1,7 +1,6 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
-import java.util.LinkedList;
 
 public class server{
   static LinkedList<KeyValuePair<Integer,clientHandler>> clientList;
@@ -11,7 +10,7 @@ public class server{
     ServerSocket serverSocket = new ServerSocket(portNumber);
     int id = 0;
     clientList = new LinkedList<>();
-    System.out.println("Initialising server on port " + portNumber);
+    System.out.println("Initialised server on port " + portNumber + " ready to accept connections");
     while(true){
       Socket clientSocket;
       try{

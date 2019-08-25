@@ -81,9 +81,10 @@ public class clientHandler extends Thread{
           this.s.close();
           break;
         }
+        //decode the message into recipient and message parts
         int recipient = getRecipientFromMessage(inputLine);
         String msg = getMessageString(inputLine);
-        System.out.println("sending message " + msg + " to client id " + reciever);
+        System.out.println("sending message " + msg + " to client id " + recipiente);
         (getRecipient(recipient)).sendMessage("Client " + id + " sent you: "+ msg);
 
 
@@ -93,8 +94,7 @@ public class clientHandler extends Thread{
     }
 
     try
-    {
-      // closing resources
+    {// closing resources
       this.in.close();
       this.out.close();
 
