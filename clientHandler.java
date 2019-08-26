@@ -7,6 +7,7 @@ public class clientHandler extends Thread{
   final PrintWriter out;
   final Socket s;
   int id;
+  private String username;
 
   public int getID(){
     return this.id;
@@ -16,6 +17,12 @@ public class clientHandler extends Thread{
     this.out = out;
     this.s = s;
     this.id = id;
+  }
+  public String getUsername(){
+    return this.username;
+  }
+  public void setUsername(String username){
+    this.username = username;
   }
   public void sendMessage(String msg){
     this.out.println(msg);
@@ -38,7 +45,11 @@ public class clientHandler extends Thread{
 
   public int getRecipientFromMessage(String message){
     //messages will be of the form: {recipient_client_id} message
-    return Integer.parseInt(message.substring(message.indexOf("{") + 1, message.indexOf("}")));
+    try{
+      return Integer.parseInt(message.substring(message.indexOf("{") + 1, message.indexOf("}")));
+    }catch(StringIndexOutOfBoundsException e){
+      return -1;
+    }
   }
 
   public String getMessageString(String message){
@@ -53,39 +64,66 @@ public class clientHandler extends Thread{
   @Override
   public void run(){
     String inputLine, outputLine;
-
-    outputLine = "Connection established";
-    out.println(outputLine);
+    try{
+      outputLine = "Connection established, please enter username";
+      out.println(outputLine);
+      inputLine = in.readLine();
+      this.username = inputLine;
+      out.println("Username set to " + this.username);
+    }catch(IOException e){
+      e.printStackTrace();
+    }
 
     try{
       while((inputLine = in.readLine()) != null){
         //System.out.println("Client " + this.id +": " + inputLine);
         //pass the message onto the relevant client
-        if(inputLine.equals("list")){
-          outputLine = "";
+        //first check if the user has entered a command
+        if(inputLine.toUpperCase().equals("LIST")){
           System.out.println("Client " + this.s + " sends list "+
           "generating string of client ids");
-          for(int x = 0; x < server.clientList.size(); x++ ){
-            int id = server.clientList.get(x).getKey();
-            if(id != this.id){
-              outputLine += " Client:" + id;
-            }
-          }
-          out.println(outputLine);
+          out.println(server.getListOfClients(this.id));
           continue;
         }
-        if(inputLine.equals("exit")){
-          System.out.println("Client " + this.s + " sends exit... "+
+        if(inputLine.toUpperCase().equals("EXIT")){
+          System.out.println("Client " + this.s + " requests exit "+
           "Closing this connection.");
+          out.println("CLOSE -0"); //close code for client 0 indicates closure from exit request
           removeSelf();
           this.s.close();
           break;
         }
+        if(inputLine.toUpperCase().equals("SEARCH")){
+          System.out.println("Please enter username to search for ");
+          inputLine = in.readLine();
+          int id = server.findUser(inputLine);
+          if(id >= 0){
+            out.println("Found client with username " + inputLine + " with id " + id);
+          }else{
+            out.println("A client with username " + inputLine + " is not currently connected to the server ");
+          }
+          continue;
+        }
+        if(inputLine.toUpperCase().equals("HELP") || inputLine.toUpperCase().equals("COMMANDS")){
+          out.println("help : generates a list of available commands and their functions\n"
+          +"commands : generates a list of available commands and their functions\n"
+          +"list : generates a list of currently connected clients, displaying their username and id\n"
+          +"search : asks for a username and attempts to find the relevant id of that user\n"
+          +"exit : closes the connection to the server");
+          continue;
+        }
+
         //decode the message into recipient and message parts
         int recipient = getRecipientFromMessage(inputLine);
-        String msg = getMessageString(inputLine);
-        System.out.println("sending message " + msg + " to client id " + recipiente);
-        (getRecipient(recipient)).sendMessage("Client " + id + " sent you: "+ msg);
+        if(recipient >= 0){
+          System.out.println("decoded message into recipient num " + recipient);
+          String msg = getMessageString(inputLine);
+          System.out.println("sending message " + msg + " to client id " + recipient);
+          (getRecipient(recipient)).sendMessage("Client " + id + " sent you: "+ msg);
+        }else{
+          out.println("Messages must be of the form: '{recipient id} message'." +
+          " For a list of connected client ids, use command: 'list'");
+        }
 
 
       }

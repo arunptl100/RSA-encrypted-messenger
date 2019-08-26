@@ -5,6 +5,35 @@ import java.util.*;
 public class server{
   static LinkedList<KeyValuePair<Integer,clientHandler>> clientList;
 
+  /*method returning a string of connected clients usernames and respective ids
+  */
+  public static String getListOfClients(int clientHandlerID){
+    String out = "";
+    for(int x = 0; x < clientList.size(); x++ ){
+      int id = clientList.get(x).getKey();
+      String username = clientList.get(x).getVal().getUsername();
+      if(id != clientHandlerID){
+        out += "[Username: " + username + " id: " + id  + "]\n";
+      }
+    }
+    return out;
+  }
+
+  /*method returning the client ID of the first occurence of a client with the
+  *desired username
+  *Error code: -1 indicates the username coudnt find be found
+  */
+  public static int findUser(String username){
+    for(int x = 0; x < clientList.size(); x++ ){
+      int id = clientList.get(x).getKey();
+      String CurrUsername = clientList.get(x).getVal().getUsername();
+      if(CurrUsername == username){
+        return id;
+      }
+    }
+    return -1;
+  }
+
   public static void main(String[] args) throws IOException{
     int portNumber = 25565;
     ServerSocket serverSocket = new ServerSocket(portNumber);

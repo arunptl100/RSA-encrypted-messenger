@@ -63,5 +63,6 @@ public class RSA{
     // BigInteger decryptMess = rcvr.decrypt(cipherT);
     //System.out.println("Result of Decryption " + decryptMess);
     System.out.println("===================================================================");
+    System.exit(0);
   }
 }
