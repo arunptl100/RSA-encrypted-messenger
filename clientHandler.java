@@ -61,15 +61,20 @@ public class clientHandler extends Thread{
     server.clientList.remove((getIndexOfId(this.id)));
   }
 
+  public void sendServerMessage(String msg){
+    out.println(server.GenConsoleMessage(msg));
+  }
+
+
   @Override
   public void run(){
     String inputLine, outputLine;
     try{
       outputLine = "Connection established, please enter username";
-      out.println(outputLine);
+      sendServerMessage(outputLine);
       inputLine = in.readLine();
       this.username = inputLine;
-      out.println("Username set to " + this.username);
+      sendServerMessage("Username set to " + this.username);
     }catch(IOException e){
       e.printStackTrace();
     }
@@ -80,32 +85,32 @@ public class clientHandler extends Thread{
         //pass the message onto the relevant client
         //first check if the user has entered a command
         if(inputLine.toUpperCase().equals("LIST")){
-          System.out.println("Client " + this.s + " sends list "+
+          System.out.println(server.GenConsoleMessage("Client " + this.s + " sends list ")+
           "generating string of client ids");
-          out.println(server.getListOfClients(this.id));
+          sendServerMessage(server.getListOfClients(this.id));
           continue;
         }
         if(inputLine.toUpperCase().equals("EXIT")){
-          System.out.println("Client " + this.s + " requests exit "+
-          "Closing this connection.");
-          out.println("CLOSE -0"); //close code for client 0 indicates closure from exit request
+          System.out.println(server.GenConsoleMessage("Client " + this.s + " requests exit "+
+          "Closing this connection."));
+          sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
           removeSelf();
           this.s.close();
           break;
         }
         if(inputLine.toUpperCase().equals("SEARCH")){
-          System.out.println("Please enter username to search for ");
+          System.out.println(server.GenConsoleMessage("Please enter username to search for "));
           inputLine = in.readLine();
           int id = server.findUser(inputLine);
           if(id >= 0){
-            out.println("Found client with username " + inputLine + " with id " + id);
+            sendServerMessage("Found client with username " + inputLine + " with id " + id);
           }else{
-            out.println("A client with username " + inputLine + " is not currently connected to the server ");
+            sendServerMessage("A client with username " + inputLine + " is not currently connected to the server ");
           }
           continue;
         }
         if(inputLine.toUpperCase().equals("HELP") || inputLine.toUpperCase().equals("COMMANDS")){
-          out.println("help : generates a list of available commands and their functions\n"
+          sendServerMessage("help : generates a list of available commands and their functions\n"
           +"commands : generates a list of available commands and their functions\n"
           +"list : generates a list of currently connected clients, displaying their username and id\n"
           +"search : asks for a username and attempts to find the relevant id of that user\n"
@@ -116,12 +121,12 @@ public class clientHandler extends Thread{
         //decode the message into recipient and message parts
         int recipient = getRecipientFromMessage(inputLine);
         if(recipient >= 0){
-          System.out.println("decoded message into recipient num " + recipient);
+          System.out.println(server.GenConsoleMessage("decoded message into recipient num " + recipient));
           String msg = getMessageString(inputLine);
-          System.out.println("sending message " + msg + " to client id " + recipient);
+          System.out.println(server.GenConsoleMessage("sending message " + msg + " to client id " + recipient));
           (getRecipient(recipient)).sendMessage("Client " + id + " sent you: "+ msg);
         }else{
-          out.println("Messages must be of the form: '{recipient id} message'." +
+          sendServerMessage("Messages must be of the form: '{recipient id} message'." +
           " For a list of connected client ids, use command: 'list'");
         }
 

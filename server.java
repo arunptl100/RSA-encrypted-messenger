@@ -1,9 +1,13 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class server{
   static LinkedList<KeyValuePair<Integer,clientHandler>> clientList;
+  static SimpleDateFormat dateFormat;
+  static Date date;
 
   /*method returning a string of connected clients usernames and respective ids
   */
@@ -34,17 +38,23 @@ public class server{
     return -1;
   }
 
+  public static String GenConsoleMessage(String msg){
+    return (dateFormat.format(date) + ": " + msg);
+  }
+
   public static void main(String[] args) throws IOException{
     int portNumber = 25565;
     ServerSocket serverSocket = new ServerSocket(portNumber);
     int id = 0;
+    dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+    date = new Date();
     clientList = new LinkedList<>();
-    System.out.println("Initialised server on port " + portNumber + " ready to accept connections");
+    System.out.println(GenConsoleMessage("Initialised server on port " + portNumber + " ready to accept connections"));
     while(true){
       Socket clientSocket;
       try{
         clientSocket = serverSocket.accept();
-        System.out.println("new client connected " + clientSocket + " id = " + id);
+        System.out.println(GenConsoleMessage("new client connected " + clientSocket + " id = " + id));
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         // create a new thread object
