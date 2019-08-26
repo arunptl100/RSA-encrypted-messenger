@@ -91,15 +91,15 @@ public class clientHandler extends Thread{
           continue;
         }
         if(inputLine.toUpperCase().equals("EXIT")){
-          System.out.println(server.GenConsoleMessage("Client " + this.s + " requests exit "+
-          "Closing this connection."));
-          sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
+          System.out.println(server.GenConsoleMessage("Client " + this.s + " requests exit ")+
+          "Closing this connection.");
           removeSelf();
+          sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
           this.s.close();
           break;
         }
         if(inputLine.toUpperCase().equals("SEARCH")){
-          System.out.println(server.GenConsoleMessage("Please enter username to search for "));
+          sendServerMessage("Please enter username to search for ");
           inputLine = in.readLine();
           int id = server.findUser(inputLine);
           if(id >= 0){
@@ -121,10 +121,13 @@ public class clientHandler extends Thread{
         //decode the message into recipient and message parts
         int recipient = getRecipientFromMessage(inputLine);
         if(recipient >= 0){
+          sendServerMessage("Attempting to send message to user " + id);
           System.out.println(server.GenConsoleMessage("decoded message into recipient num " + recipient));
           String msg = getMessageString(inputLine);
           System.out.println(server.GenConsoleMessage("sending message " + msg + " to client id " + recipient));
-          (getRecipient(recipient)).sendMessage("Client " + id + " sent you: "+ msg);
+          (getRecipient(recipient)).sendMessage(server.GenConsoleMessage("Recieved message from client ["+username
+          + ",id:" + id + "] : "+ msg));
+          sendServerMessage("Message delivered to client id : " + id);
         }else{
           sendServerMessage("Messages must be of the form: '{recipient id} message'." +
           " For a list of connected client ids, use command: 'list'");
@@ -132,6 +135,10 @@ public class clientHandler extends Thread{
 
 
       }
+      System.out.println(server.GenConsoleMessage("Client " + this.s + " has exited, closing the connection"));
+      removeSelf();
+      sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
+      this.s.close();
     }catch(IOException e){
       e.printStackTrace();
     }

@@ -4,6 +4,14 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
+/* Its possible for users to exit without using the exit command leading to
+ * clients being stored in the structure that point to nothing
+ * this can lead to errors if a user tries to message a client that doesnt exist
+ * possibly cleanup the structure every 5 seconds?
+ * or catch this event where a user tries to message a non existent client
+ *  and remove it then ?
+ */
 public class server{
   static LinkedList<KeyValuePair<Integer,clientHandler>> clientList;
   static SimpleDateFormat dateFormat;
@@ -12,12 +20,12 @@ public class server{
   /*method returning a string of connected clients usernames and respective ids
   */
   public static String getListOfClients(int clientHandlerID){
-    String out = "";
+    String out = "Connected clients :- ";
     for(int x = 0; x < clientList.size(); x++ ){
       int id = clientList.get(x).getKey();
       String username = clientList.get(x).getVal().getUsername();
       if(id != clientHandlerID){
-        out += "[Username: " + username + " id: " + id  + "]\n";
+        out += "[Username: " + username + " id: " + id  + "] , ";
       }
     }
     return out;
@@ -31,7 +39,7 @@ public class server{
     for(int x = 0; x < clientList.size(); x++ ){
       int id = clientList.get(x).getKey();
       String CurrUsername = clientList.get(x).getVal().getUsername();
-      if(CurrUsername == username){
+      if(CurrUsername.equals(username)){
         return id;
       }
     }

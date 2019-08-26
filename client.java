@@ -28,6 +28,7 @@ public class client{
       while(true){
         fromUser = stdIn.readLine();
         if(fromUser.toUpperCase().equals("EXIT")){
+          out.println(fromUser);
           break;
         }else if(fromUser != null){
           //System.out.println("Sending message " + fromUser);
