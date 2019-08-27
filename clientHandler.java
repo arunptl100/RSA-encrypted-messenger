@@ -64,7 +64,7 @@ public class clientHandler extends Thread{
     //messages will be of the form: {recipient_client_id} message
     try{
       return Integer.parseInt(message.substring(message.indexOf("{") + 1, message.indexOf("}")));
-    }catch(StringIndexOutOfBoundsException e){
+    }catch(Exception e){
       return -1;
     }
   }
@@ -81,7 +81,7 @@ public class clientHandler extends Thread{
    * structure.
    */
   public void removeSelf(){
-    System.out.println("Removing " + this.id + " from client list");
+    System.out.println(server.GenConsoleMessage("Removing " + this.id + " from client list"));
     server.clientList.remove((getIndexOfId(this.id)));
   }
 
@@ -104,14 +104,11 @@ public class clientHandler extends Thread{
       inputLine = in.readLine();
       this.username = inputLine;
       sendServerMessage("Username set to " + this.username);
-      sendServerMessage("Please enter public key value ");;
     }catch(IOException e){
       e.printStackTrace();
     }
 
     try{
-      //read in the clients public key value e and n
-      inputLine = in.readLine()
       while((inputLine = in.readLine()) != null){
         //System.out.println("Client " + this.id +": " + inputLine);
         //pass the message onto the relevant client

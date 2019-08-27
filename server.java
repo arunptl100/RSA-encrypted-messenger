@@ -1,15 +1,13 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+
 
 
 public class server{
   //data structure for storing connected clients
   static LinkedList<KeyValuePair<Integer,clientHandler>> clientList;
-  static SimpleDateFormat dateFormat;
-  static Date date;
 
   /*method returning a string of connected clients usernames and respective ids
   */
@@ -44,7 +42,7 @@ public class server{
    *beginning of the passed message
    */
   public static String GenConsoleMessage(String msg){
-    return (dateFormat.format(date) + ": " + msg);
+    return (java.time.LocalDateTime.now() + ": " + msg);
   }
 
   public static void main(String[] args) throws IOException{
@@ -52,8 +50,6 @@ public class server{
     int portNumber = 25565;
     ServerSocket serverSocket = new ServerSocket(portNumber);
     int id = 0;
-    dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-    date = new Date();
     clientList = new LinkedList<>();
     System.out.println(GenConsoleMessage("Initialised server on port " + portNumber + " ready to accept connections"));
     while(true){
