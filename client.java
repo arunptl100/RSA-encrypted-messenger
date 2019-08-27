@@ -5,7 +5,7 @@ import java.util.*;
 public class client{
   static BufferedReader in;
 
-  public client(String hostName, int portNumber){
+  public client(String hostName, int portNumber, int[] pubKey){
     /* usr names for connected clients (store as kvps in the client storage structure?)
      * search for a connected clients id based on username
      *
@@ -45,7 +45,9 @@ public class client{
     }
   }
 }
-
+/*
+ *
+ */
 class serverListener extends Thread{
   String fromServer;
   public void run(){

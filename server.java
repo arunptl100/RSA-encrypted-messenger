@@ -5,14 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-/* Its possible for users to exit without using the exit command leading to
- * clients being stored in the structure that point to nothing
- * this can lead to errors if a user tries to message a client that doesnt exist
- * possibly cleanup the structure every 5 seconds?
- * or catch this event where a user tries to message a non existent client
- *  and remove it then ?
- */
 public class server{
+  //data structure for storing connected clients
   static LinkedList<KeyValuePair<Integer,clientHandler>> clientList;
   static SimpleDateFormat dateFormat;
   static Date date;
@@ -46,11 +40,15 @@ public class server{
     return -1;
   }
 
+  /*Method returning a string with the current date and time attached to the
+   *beginning of the passed message
+   */
   public static String GenConsoleMessage(String msg){
     return (dateFormat.format(date) + ": " + msg);
   }
 
   public static void main(String[] args) throws IOException{
+    /*Initialise the resources needed to start the server*/
     int portNumber = 25565;
     ServerSocket serverSocket = new ServerSocket(portNumber);
     int id = 0;
@@ -61,6 +59,7 @@ public class server{
     while(true){
       Socket clientSocket;
       try{
+        //when a client connects initialise the conenction and add it to the client structure
         clientSocket = serverSocket.accept();
         System.out.println(GenConsoleMessage("new client connected " + clientSocket + " id = " + id));
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
