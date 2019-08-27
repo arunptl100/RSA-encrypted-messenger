@@ -8,13 +8,11 @@ public class clientHandler extends Thread{
   final Socket s;
   int id;
   private String username;
-  private int pubKey_n;
-  private int pubKey_e;
 
   public int getID(){
     return this.id;
   }
-  public clientHandler(BufferedReader in, PrintWriter out, Socket s, int pubKey_n, int pubKey_e){
+  public clientHandler(BufferedReader in, PrintWriter out, Socket s, int id){
     this.in = in;
     this.out = out;
     this.s = s;
@@ -106,11 +104,14 @@ public class clientHandler extends Thread{
       inputLine = in.readLine();
       this.username = inputLine;
       sendServerMessage("Username set to " + this.username);
+      sendServerMessage("Please enter public key value ");;
     }catch(IOException e){
       e.printStackTrace();
     }
 
     try{
+      //read in the clients public key value e and n
+      inputLine = in.readLine()
       while((inputLine = in.readLine()) != null){
         //System.out.println("Client " + this.id +": " + inputLine);
         //pass the message onto the relevant client
