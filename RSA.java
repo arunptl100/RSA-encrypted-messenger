@@ -52,9 +52,10 @@ public class RSA{
     System.out.println("Encrypted message " + message + " -> ");
     for (int x = 0 ;x < cipherText.length ;x++ ) {
       System.out.print(" " + cipherText[x]);
-    }System.out.println();
+    }
+    System.out.println();
     String decrypt = rcvr.decryptString(cipherText);
-    System.out.println("Result of decryption --> " + decrypt );
+    System.out.println("Result of decryption --> " + decrypt);
     // String ciphertext = sender.encryptString(message);
     // System.out.println("Encrypted message " + message + " -> " + ciphertext);
     // String decryptMessage = rcvr.decryptString(ciphertext);

@@ -74,7 +74,7 @@ public class clientHandler extends Thread{
    *    string of the form "{recipient id} message"
    */
   public String getMessageString(String message){
-    return message.substring(message.indexOf("{"));
+    return message.substring(message.indexOf("}")+2);
   }
 
   /* Method that removes the current clientHandler instance from the client
@@ -174,7 +174,7 @@ public class clientHandler extends Thread{
           sendServerMessage("Attempting to send message to user " + id);
           System.out.println(server.GenConsoleMessage("decoded message into recipient num " + recipient));
           String msg = getMessageString(inputLine);
-          System.out.println(server.GenConsoleMessage("sending message " + msg + " to client id " + recipient));
+          System.out.println(server.GenConsoleMessage("sending message {" + msg + "} to client id " + recipient));
           //get the recipient clientHandler object and send the intended message to the recipient
           //prepare the message by calling server.GenConsoleMessage with the message
           (getRecipient(recipient)).sendMessage(server.GenConsoleMessage("Recieved message from client ["+username
