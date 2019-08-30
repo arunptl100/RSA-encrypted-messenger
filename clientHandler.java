@@ -100,7 +100,7 @@ public class clientHandler extends Thread{
     String inputLine, outputLine;
     try{
       outputLine = "Connection established, please enter username";
-      sendServerMessage(outputLine);
+      sendServerMessage(ConsoleColours.GREEN + outputLine + ConsoleColours.RESET);
       inputLine = in.readLine();
       this.username = inputLine;
       sendServerMessage("Username set to " + this.username);
@@ -129,8 +129,8 @@ public class clientHandler extends Thread{
          * the client socket is also closed
          */
         if(inputLine.toUpperCase().equals("EXIT")){
-          System.out.println(server.GenConsoleMessage("Client " + this.s + " requests exit ")+
-          "Closing this connection.");
+          System.out.println(server.GenConsoleMessage(ConsoleColours.RED + "Client " + this.s + " requests exit "+
+          "Closing this connection." + ConsoleColours.RESET));
           // removeSelf();
           // sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
           // this.s.close();
@@ -179,16 +179,17 @@ public class clientHandler extends Thread{
           //prepare the message by calling server.GenConsoleMessage with the message
           (getRecipient(recipient)).sendMessage(server.GenConsoleMessage("Recieved message from client ["+username
           + ",id:" + id + "] : "+ msg));
-          sendServerMessage("Message delivered to client id : " + id);
+          sendServerMessage(ConsoleColours.GREEN + "Message delivered to client id : " + id + ConsoleColours.RESET);
         }else{
           //inform the user that their input is invalid.
-          sendServerMessage("Messages must be of the form: '{recipient id} message'." +
-          " For a list of connected client ids, use command: 'list' or 'help'");
+          sendServerMessage(ConsoleColours.RED + "Messages must be of the form: '{recipient id} message'." +
+          " For a list of connected client ids, use command: 'list' or 'help'" + ConsoleColours.RESET);
         }
       }
       //at this point the client has stopped its conenction to the server
       //close the socket and send the client an exit code
-      System.out.println(server.GenConsoleMessage("Client " + this.s + " has exited, closing the connection"));
+      System.out.println(server.GenConsoleMessage(ConsoleColours.RED + "Client " + this.s +
+      " has exited, closing the connection" + ConsoleColours.RESET));
       removeSelf();
       sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
       this.s.close();

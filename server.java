@@ -51,7 +51,8 @@ public class server{
     ServerSocket serverSocket = new ServerSocket(portNumber);
     int id = 0;
     clientList = new LinkedList<>();
-    System.out.println(GenConsoleMessage("Initialised server on port " + portNumber + " ready to accept connections"));
+    System.out.println(GenConsoleMessage(ConsoleColours.GREEN +"Initialised server on port " +
+     portNumber + " ready to accept connections" + ConsoleColours.RESET));
     while(true){
       Socket clientSocket;
       try{

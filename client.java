@@ -24,8 +24,8 @@ public class client{
       /*setup a thread for listening for messages from the server*/
       serverListener sl = new serverListener();
       Thread t = new Thread(sl);
-
       t.start();
+      //send the users public key (n,e)
       while(true){
         fromUser = stdIn.readLine();
         if(fromUser.toUpperCase().equals("EXIT")){
@@ -46,15 +46,20 @@ public class client{
     }
   }
 }
-/*
- *
+/* class dedicated listening to incoming messages from the server
+ * Instantiated and ran in a seperate thread.
+ * On recieval of a message , it prints the message to the screen
  */
 class serverListener extends Thread{
   String fromServer;
   public void run(){
     try{
+      //iterate whilst there is something being sent from the server
       while((fromServer = client.in.readLine()) != null){
+        //CLOSE -0 is a message sent from the server indicating
+        //that the associated client has requested to exit
         if(fromServer.equals("CLOSE -0")){
+          //breaking from the loop will cause the thread to end
           break;
         }
         System.out.println("Server: " + fromServer);
