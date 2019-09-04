@@ -28,7 +28,6 @@ public class RSA{
   * 1 < e < (p-1)(q-1)
   */
   public static void main(String[] args) {
-    client cl = new client("localhost",25565);
     System.out.println("====================RSA encryption implemtation====================");
 
     int p, q, e;
@@ -38,24 +37,29 @@ public class RSA{
     //int message = 450;
     if((relativelyPrime(e,(p-1))) && (relativelyPrime(e, (q-1)))
     && (e > 1) && (e < (p-1)*(q-1)) && (relativelyPrime(e,((p-1)*(q-1)))) ){
-      System.out.println("e meets the requirements");
+      System.out.println("e="+e+" meets the requirements");
     }else{
-      System.out.println("e does NOT the requirements");
+      System.out.println("e="+e+" does NOT the requirements");
     }
-
     //public Reciever(int p , int q, int e)
     Reciever rcvr = new Reciever(p,q,e);
-    Sender sender = new Sender(rcvr.getN(), rcvr.getE());
+    client cl = new client("localhost",25565, rcvr.getN(), rcvr.getE());
+    
+    //
+    //
+    // Sender sender = new Sender(rcvr.getN(), rcvr.getE());
+    //
+    // String message = "hello world";
+    // BigInteger[] cipherText = sender.encryptString(message);
+    // System.out.println("Encrypted message " + message + " -> ");
+    // for (int x = 0 ;x < cipherText.length ;x++ ) {
+    //   System.out.print(" " + cipherText[x]);
+    // }
+    // System.out.println();
+    // String decrypt = rcvr.decryptString(cipherText);
+    // System.out.println("Result of decryption --> " + decrypt);
 
-    String message = "hello world";
-    BigInteger[] cipherText = sender.encryptString(message);
-    System.out.println("Encrypted message " + message + " -> ");
-    for (int x = 0 ;x < cipherText.length ;x++ ) {
-      System.out.print(" " + cipherText[x]);
-    }
-    System.out.println();
-    String decrypt = rcvr.decryptString(cipherText);
-    System.out.println("Result of decryption --> " + decrypt);
+
     // String ciphertext = sender.encryptString(message);
     // System.out.println("Encrypted message " + message + " -> " + ciphertext);
     // String decryptMessage = rcvr.decryptString(ciphertext);

@@ -9,8 +9,8 @@ public class Sender{
   public Sender(int n, int e){
     this.n_pubKey = n;
     this.e_pubKey = e;
-    System.out.println("Initialised sender with recievers public key (n=" +
-    this.n_pubKey + ",e=" + this.e_pubKey + ")" );
+    // System.out.println("Initialised sender with recievers public key (n=" +
+    // this.n_pubKey + ",e=" + this.e_pubKey + ")" );
   }
   public void setPubKey(int n, int e){
     this.n_pubKey = n;
@@ -20,8 +20,8 @@ public class Sender{
   public BigInteger encrypt(BigInteger Message){
     //Ciphertext == M^e mod n
     //Ciphertext can be large so use BigInteger
-    System.out.println("Encrypting Message " + Message + " with public key " + this.n_pubKey
-    + " --> " + Message + "^" + this.e_pubKey + " mod " + this.n_pubKey );
+    // System.out.println("Encrypting Message " + Message + " with public key " + this.n_pubKey
+    // + " --> " + Message + "^" + this.e_pubKey + " mod " + this.n_pubKey );
     return ((Message).pow(this.e_pubKey)).mod(BigInteger.valueOf(this.n_pubKey));
   }
 

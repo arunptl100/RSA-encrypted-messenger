@@ -18,9 +18,9 @@ public class Reciever{
     this.n = p * q;
     //private key d -> e * d == 1 mod ((p-1)(q-1))
     this.d = (CongruenceModulo(1, ((this.p-1)*(this.q-1)), this.e))/this.e;
-    System.out.println("Initialised Reciever with public key (n="+n+",e="+e+")");
-    System.out.println("Reciever Private key d == (1 mod " + ((this.p-1)*(this.q-1))
-     + ")/"+ this.e + " --> " + this.d);
+    // System.out.println("Initialised Reciever with public key (n="+n+",e="+e+")");
+    // System.out.println("Reciever Private key d == (1 mod " + ((this.p-1)*(this.q-1))
+    //  + ")/"+ this.e + " --> " + this.d);
   }
 
   public int getN(){
@@ -52,8 +52,8 @@ public class Reciever{
 
   public BigInteger decrypt(BigInteger Ciphertext){
     //Decryption -> M == C^d mod n
-    System.out.println("Decrypting ciphertext: "+ Ciphertext + " --> " +
-    Ciphertext + "^" + this.d + " mod " + this.n);
+    // System.out.println("Decrypting ciphertext: "+ Ciphertext + " --> " +
+    // Ciphertext + "^" + this.d + " mod " + this.n);
     return (Ciphertext.pow(this.d)).mod(BigInteger.valueOf(this.n));
   }
 
