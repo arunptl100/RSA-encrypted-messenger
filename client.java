@@ -4,18 +4,15 @@ import java.util.*;
 import java.math.BigInteger;
 
 public class client{
-  static BufferedReader in;
+  static ObjectInputStream in;
   static String encryptMessage;
 
   public client(String hostName, int portNumber, int pubkey_n, int pubkey_e){
     try{
       /*Initialise resources to connect to the server*/
       Socket kkSocket = new Socket(hostName, portNumber);
-      PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-      in = new BufferedReader(
-      new InputStreamReader(kkSocket.getInputStream()));
-      BufferedReader stdIn =
-      new BufferedReader(new InputStreamReader(System.in));
+      ObjectOutputStream out = new ObjectOutputStream(kkSocket.getOutputStream());
+      in = new ObjectInputStream(kkSocket.getInputStream());
 
 
       Scanner sin = new Scanner(System.in);
@@ -27,13 +24,14 @@ public class client{
       t.start();
       //send the users public key (n,e)
       String pubKey = "("+pubkey_n+","+pubkey_e+")";
-      out.println(pubKey);
-
+      out.writeUTF(pubKey);
+      out.flush();
       while(true){
-        fromUser = stdIn.readLine();
+        fromUser = sin.nextLine();
 
         if(fromUser.toUpperCase().equals("EXIT")){
-          out.println(fromUser); //send the command to the server
+          out.writeUTF(fromUser); //send the command to the server
+          out.flush();
           //alowing for the connection to be closed server side
           break; //break to close the connection client side
 
@@ -53,11 +51,13 @@ public class client{
           //first get the message to be sent
           System.out.println("Client: Enter message to be sent");
           this.encryptMessage = sin.nextLine();
-          out.println(fromUser);
+          out.writeUTF(fromUser);
+          out.flush();
           continue;
         }else if(fromUser != null){
           //System.out.println("Sending message " + fromUser);
-          out.println(fromUser);
+          out.writeUTF(fromUser);
+          out.flush();
         }
       }
     }catch(UnknownHostException e){
@@ -79,7 +79,7 @@ class serverListener extends Thread{
   public void run(){
     try{
       //iterate whilst there is something being sent from the server
-      while((fromServer = client.in.readLine()) != null){
+      while((fromServer = client.in.readUTF()) != null){
         //CLOSE -0 is a message sent from the server indicating
         //that the associated client has requested to exit
         if(fromServer.equals("CLOSE -0")){

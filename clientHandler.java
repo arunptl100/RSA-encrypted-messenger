@@ -3,8 +3,8 @@ import java.util.*;
 import java.net.*;
 
 public class clientHandler extends Thread{
-  final BufferedReader in;
-  final PrintWriter out;
+  final ObjectInputStream in;
+  final ObjectOutputStream out;
   final Socket s;
   int id;
   private String username;
@@ -14,7 +14,7 @@ public class clientHandler extends Thread{
   public int getID(){
     return this.id;
   }
-  public clientHandler(BufferedReader in, PrintWriter out, Socket s, int id){
+  public clientHandler(ObjectInputStream in, ObjectOutputStream out, Socket s, int id){
     this.in = in;
     this.out = out;
     this.s = s;
@@ -27,7 +27,12 @@ public class clientHandler extends Thread{
     this.username = username;
   }
   public void sendMessage(String msg){
-    this.out.println(msg);
+    try{
+      this.out.writeUTF(msg);
+      this.out.flush();
+    }catch(IOException e){
+      e.printStackTrace();
+    }
   }
   /* Method returning the index of a client id in the client structure
   * (linked list)
@@ -93,7 +98,7 @@ public class clientHandler extends Thread{
   * of the message
   */
   public void sendServerMessage(String msg){
-    out.println(server.GenConsoleMessage(msg));
+    sendMessage(server.GenConsoleMessage(msg));
   }
 
   public String preparePublicKey(){
@@ -108,7 +113,7 @@ public class clientHandler extends Thread{
       sendServerMessage(ConsoleColours.GREEN + "Connection established" + ConsoleColours.RESET);
       //clients public key sent to server in the format:
       // "("+this.pubkey_n+","+this.e_pubKey+")";
-      String publicKey = in.readLine();
+      String publicKey = in.readUTF();
       //get the n part of the public key.. example (5,11)
       //  n begins at char 1 and ends at the character before the ,
       this.pubkey_n = Integer.parseInt(publicKey.substring(1,(publicKey.indexOf(","))));
@@ -118,7 +123,7 @@ public class clientHandler extends Thread{
       sendServerMessage("Public key stored on server as (n=" + this.pubkey_n + ",e=" + this.pubkey_e + ")");
       outputLine = "Please enter username";
       sendServerMessage(ConsoleColours.GREEN + outputLine + ConsoleColours.RESET);
-      inputLine = in.readLine();
+      inputLine = in.readUTF();
       this.username = inputLine;
       sendServerMessage("Username set to " + this.username);
     }catch(IOException e){
@@ -126,7 +131,7 @@ public class clientHandler extends Thread{
     }
 
     try{
-      while((inputLine = in.readLine()) != null){
+      while((inputLine = in.readUTF()) != null){
         //System.out.println("Client " + this.id +": " + inputLine);
         //pass the message onto the relevant client
         //first check if the user has entered a command
@@ -134,20 +139,20 @@ public class clientHandler extends Thread{
           System.out.println(server.GenConsoleMessage("initiating encrypt command for client " + this.id));
           sendServerMessage("Enter client id to send encrypted message to");
           try{
-            int id = getIndexOfId(Integer.parseInt(in.readLine()));
+            int id = getIndexOfId(Integer.parseInt(in.readUTF()));
             if(id < 0){
               sendServerMessage(ConsoleColours.RED +
               "The client id you have entered could not be found on the server, " +
               "use the command" + ConsoleColours.GREEN + " 'list' " +
               ConsoleColours.RED + "for a list of connected clients "
-               + ConsoleColours.RESET);
+              + ConsoleColours.RESET);
             }else{
               //get the public key of the the reciever and send it to the client
               String recipPubkey = getRecipient(id).preparePublicKey();
               //sendServerMessage("Public key for client id " + id + " = " + recipPubkey);
               System.out.println(server.GenConsoleMessage(
               "sending client " + id + " public key (" +recipPubkey+ ") to client "+ this.id));
-              out.println("-PKEY01" + recipPubkey);
+              out.writeUTF("-PKEY01" + recipPubkey);
             }
           }catch(Exception e){
             sendServerMessage(ConsoleColours.RED + "Invalid client id" + ConsoleColours.RESET);
@@ -172,9 +177,9 @@ public class clientHandler extends Thread{
         if(inputLine.toUpperCase().equals("EXIT")){
           System.out.println(server.GenConsoleMessage(ConsoleColours.RED + "Client " + this.s + " requests exit "+
           "Closing this connection." + ConsoleColours.RESET));
-          // removeSelf();
-          // sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
-          // this.s.close();
+          removeSelf();
+          sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
+          this.s.close();
           break;
         }
         /* search command
@@ -184,7 +189,7 @@ public class clientHandler extends Thread{
         */
         if(inputLine.toUpperCase().equals("SEARCH")){
           sendServerMessage("Please enter username to search for ");
-          inputLine = in.readLine();
+          inputLine = in.readUTF();
           int id = server.findUser(inputLine);
           if(id >= 0){
             sendServerMessage("Found client with username " + inputLine + " with id " + id);
@@ -213,30 +218,33 @@ public class clientHandler extends Thread{
         //if the recipient is < 0 then the client has sent an invalid message or
         //the recipient client id does not exist in the structure
         if(recipient >= 0){
-          sendServerMessage("Attempting to send message to user " + id);
+          sendServerMessage("Attempting to send message to user " + recipient);
           System.out.println(server.GenConsoleMessage("decoded message into recipient num " + recipient));
           String msg = getMessageString(inputLine);
           System.out.println(server.GenConsoleMessage("sending message {" + msg + "} to client id " + recipient));
           //get the recipient clientHandler object and send the intended message to the recipient
           //prepare the message by calling server.GenConsoleMessage with the message
           (getRecipient(recipient)).sendMessage(server.GenConsoleMessage("Recieved message from client ["+username
-          + ",id:" + id + "] : "+ msg));
-          sendServerMessage(ConsoleColours.GREEN + "Message delivered to client id : " + id + ConsoleColours.RESET);
+          + ",id:" + this.id + "] : "+ msg));
+          sendServerMessage(ConsoleColours.GREEN + "Message delivered to client id : " + recipient + ConsoleColours.RESET);
         }else{
           //inform the user that their input is invalid.
           sendServerMessage(ConsoleColours.RED + "Messages must be of the form: '{recipient id} message'." +
-          " For a list of connected client ids, use command: 'list' or 'help'" + ConsoleColours.RESET);
+          " For a list of connected client ids, use command: "+ ConsoleColours.GREEN +"'list' or 'help'" + ConsoleColours.RESET);
         }
+
       }
-      //at this point the client has stopped its conenction to the server
-      //close the socket and send the client an exit code
-      System.out.println(server.GenConsoleMessage(ConsoleColours.RED + "Client " + this.s +
-      " has exited, closing the connection" + ConsoleColours.RESET));
-      removeSelf();
-      sendServerMessage("CLOSE -0"); //close code for client 0 indicates closure from exit request
-      this.s.close();
-    }catch(IOException e){
-      e.printStackTrace();
+
+    }catch(Exception e){
+      try{
+        System.out.println(server.GenConsoleMessage(ConsoleColours.RED + "Client " + this.s +
+        " has exited, closing the connection" + ConsoleColours.RESET));
+        removeSelf();
+        this.s.close();
+      }catch(Exception f){
+        f.printStackTrace();
+      }
+
     }
 
     try

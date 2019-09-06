@@ -17,7 +17,7 @@ public class server{
       int id = clientList.get(x).getKey();
       String username = clientList.get(x).getVal().getUsername();
       if(id != clientHandlerID){
-        out += "[Username: " + username + " id: " + id  + "] , ";
+        out += "[Username:" + username + ",id:" + id  + "] , ";
       }
     }
     return out;
@@ -59,8 +59,8 @@ public class server{
         //when a client connects initialise the conenction and add it to the client structure
         clientSocket = serverSocket.accept();
         System.out.println(GenConsoleMessage("new client connected " + clientSocket + " id = " + id));
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+        ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
         // create a new thread object
         clientHandler client = new clientHandler(in, out, clientSocket, id);
         Thread t = new Thread(client);
