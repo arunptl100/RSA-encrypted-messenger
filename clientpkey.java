@@ -5,6 +5,7 @@ public class clientpkey implements Serializable{
   int n;
   int e;
   int id;
+  String username;
   public clientpkey(int n, int e){
     this.n = n;
     this.e = e;

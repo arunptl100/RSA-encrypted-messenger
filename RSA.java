@@ -28,7 +28,7 @@ public class RSA{
   * 1 < e < (p-1)(q-1)
   */
   public static void main(String[] args) {
-    System.out.println("====================RSA encryption implemtation====================");
+    System.out.println("====================RSA encrypted messenger====================");
 
     int p, q, e;
     p = 97;
@@ -41,10 +41,9 @@ public class RSA{
     }else{
       System.out.println("e="+e+" does NOT the requirements");
     }
-    //public Reciever(int p , int q, int e)
-    Reciever rcvr = new Reciever(p,q,e);
-    client cl = new client("localhost",25565, rcvr.getN(), rcvr.getE());
-    
+
+    client cl = new client("localhost",25565, p, q, e);
+
     //
     //
     // Sender sender = new Sender(rcvr.getN(), rcvr.getE());
