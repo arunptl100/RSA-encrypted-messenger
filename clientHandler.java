@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.math.BigInteger;
 
 public class clientHandler extends Thread{
   final ObjectInputStream in;
@@ -13,6 +14,12 @@ public class clientHandler extends Thread{
 
   public int getID(){
     return this.id;
+  }
+  public int getPubKeyN(){
+    return this.pubkey_n;
+  }
+  public int getPubKeyE(){
+    return this.pubkey_e;
   }
   public clientHandler(ObjectInputStream in, ObjectOutputStream out, Socket s, int id){
     this.in = in;
@@ -101,46 +108,32 @@ public class clientHandler extends Thread{
     sendMessage(server.GenConsoleMessage(msg));
   }
 
-  public String preparePublicKey(){
-    return ("("+this.pubkey_e+","+this.pubkey_n+")");
-  }
-
 
   @Override
   public void run(){
     String inputLine, outputLine;
     try{
       sendServerMessage(ConsoleColours.GREEN + "Connection established" + ConsoleColours.RESET);
-      //clients public key sent to server in the format:
-      // "("+this.pubkey_n+","+this.e_pubKey+")";
-      String publicKey = in.readUTF();
-      //get the n part of the public key.. example (5,11)
-      //  n begins at char 1 and ends at the character before the ,
-      this.pubkey_n = Integer.parseInt(publicKey.substring(1,(publicKey.indexOf(","))));
-      //get the e part of the public key.. example (5,11)
-      //  n begins at the character after the , and ends at the character before the )
-      this.pubkey_e = Integer.parseInt(publicKey.substring((publicKey.indexOf(",")+1),(publicKey.indexOf(")"))));
+      clientpkey cpkey = (clientpkey) in.readObject();
+      this.pubkey_n = cpkey.n;
+      this.pubkey_e = cpkey.e;
       sendServerMessage("Public key stored on server as (n=" + this.pubkey_n + ",e=" + this.pubkey_e + ")");
       outputLine = "Please enter username";
       sendServerMessage(ConsoleColours.GREEN + outputLine + ConsoleColours.RESET);
       inputLine = in.readUTF();
       this.username = inputLine;
       sendServerMessage("Username set to " + this.username);
-    }catch(IOException e){
-      e.printStackTrace();
-    }
 
-    try{
       while((inputLine = in.readUTF()) != null){
         //System.out.println("Client " + this.id +": " + inputLine);
         //pass the message onto the relevant client
         //first check if the user has entered a command
         if(inputLine.toUpperCase().equals("ENCRYPT")){
           System.out.println(server.GenConsoleMessage("initiating encrypt command for client " + this.id));
-          sendServerMessage("Enter client id to send encrypted message to");
           try{
-            int id = getIndexOfId(Integer.parseInt(in.readUTF()));
-            if(id < 0){
+            //cient will send empty clientpKey object with recipient id
+            int recipient_id = in.readInt();
+            if((getIndexOfId(recipient_id)) < 0){
               sendServerMessage(ConsoleColours.RED +
               "The client id you have entered could not be found on the server, " +
               "use the command" + ConsoleColours.GREEN + " 'list' " +
@@ -148,11 +141,25 @@ public class clientHandler extends Thread{
               + ConsoleColours.RESET);
             }else{
               //get the public key of the the reciever and send it to the client
-              String recipPubkey = getRecipient(id).preparePublicKey();
-              //sendServerMessage("Public key for client id " + id + " = " + recipPubkey);
+              clientHandler recipient = getRecipient(recipient_id);
+              clientpkey recipPkey = new clientpkey(recipient.getPubKeyN(),recipient.getPubKeyE());
+              recipPkey.id = recipient_id;
+              //write the object to the client
+              out.writeUTF("-PKEY01");
+              out.flush();
+              out.writeObject(recipPkey);
+              out.flush();
               System.out.println(server.GenConsoleMessage(
-              "sending client " + id + " public key (" +recipPubkey+ ") to client "+ this.id));
-              out.writeUTF("-PKEY01" + recipPubkey);
+              "sending public key of client " + recipient_id + " public key (" +recipPkey.n+","+recipPkey.e+ ") to client "+ this.id));
+              //wait for the client to compute ciphertext and to send it here
+              BigInteger[] cipherText = (BigInteger[]) in.readObject();
+              System.out.print(server.GenConsoleMessage(
+              "Recieved ciphertext from client " + this.id + ": "));
+              for (int x = 0; x < cipherText.length; x++ ) {
+                System.out.print(cipherText[x] + ",");
+              }
+              System.out.println();
+
             }
           }catch(Exception e){
             sendServerMessage(ConsoleColours.RED + "Invalid client id" + ConsoleColours.RESET);
