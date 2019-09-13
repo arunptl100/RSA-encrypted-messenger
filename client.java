@@ -4,7 +4,7 @@ import java.util.*;
 import java.math.BigInteger;
 
 public class client{
-  static String encryptedMessage;
+
 
   public client(String hostName, int portNumber, int pubkey_p, int pubkey_q, int pubkey_e){
     try{
@@ -48,7 +48,7 @@ public class client{
 
             int recipient_id;
             System.out.println("Client: Enter message to be sent");
-            encryptedMessage = sin.nextLine();
+            sl.encryptedMessage = sin.nextLine();
             System.out.println("Client: Enter client id to sent message to");
             recipient_id = Integer.parseInt(sin.nextLine());
             out.writeUTF(fromUser); //sends the command encrypt to the server
@@ -91,6 +91,7 @@ class serverListener extends Thread{
   ObjectInputStream in;
   ObjectOutputStream out;
   Reciever rcvr;
+  volatile String encryptedMessage;
 
   public serverListener(ObjectInputStream in, ObjectOutputStream out, int pubkey_p, int pubkey_q, int pubkey_e){
     this.in = in;
@@ -126,7 +127,7 @@ class serverListener extends Thread{
           System.out.println("Client: Recieved public key from server of recipient with id "+recipPkey.id+" n = " + n + ", e = " + e);
           Sender encr = new Sender(n, e);
           System.out.print("Client: Generated ciphertext: ");
-          BigInteger[] encryptedMess = encr.encryptString(client.encryptedMessage);
+          BigInteger[] encryptedMess = encr.encryptString(this.encryptedMessage);
           for (int x = 0; x < encryptedMess.length; x++ ) {
             System.out.print(encryptedMess[x] + ",");
           }
