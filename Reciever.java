@@ -23,11 +23,20 @@ public class Reciever{
     //  + ")/"+ this.e + " --> " + this.d);
   }
 
+  //constructor for decrypting
+  public Reciever(int n, int e){
+    this.d = e;
+    this.n = n;
+  }
+
   public int getN(){
     return this.n;
   }
   public int getE(){
     return this.e;
+  }
+  public int getPrivateKey(){
+    return this.d;
   }
 
   public int CongruenceModulo(int b , int n, int e){
@@ -52,8 +61,8 @@ public class Reciever{
 
   public BigInteger decrypt(BigInteger Ciphertext){
     //Decryption -> M == C^d mod n
-    // System.out.println("Decrypting ciphertext: "+ Ciphertext + " --> " +
-    // Ciphertext + "^" + this.d + " mod " + this.n);
+    //System.out.println("Decrypting ciphertext: "+ Ciphertext + " --> " +
+    //Ciphertext + "^" + this.d + " mod " + this.n);
     return (Ciphertext.pow(this.d)).mod(BigInteger.valueOf(this.n));
   }
 

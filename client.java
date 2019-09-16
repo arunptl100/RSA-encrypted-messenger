@@ -2,9 +2,29 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.math.BigInteger;
+import java.security.MessageDigest;
 
 public class client{
 
+  /* Method to hash a string using SHA256
+  * Returns the result in hex representation
+  */
+  public static String getSHA256Hash(String data) {
+    String result = null;
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      byte[] hash = digest.digest(data.getBytes("UTF-8"));
+      // bytes to hex
+      StringBuilder sb = new StringBuilder();
+      for (byte b : hash) {
+        sb.append(String.format("%02x", b));
+      }
+      return sb.toString();
+    }catch(Exception ex) {
+      ex.printStackTrace();
+    }
+    return result;
+  }
 
   public client(String hostName, int portNumber, int pubkey_p, int pubkey_q, int pubkey_e){
     try{
@@ -109,6 +129,7 @@ class serverListener extends Thread{
           //breaking from the loop will cause the thread to end
           break;
 
+        }else if(fromServer.toUpperCase().equals("-PKEY01")){
           /* encrypt command continuation
           * the server has sent the message to the client "-PKEY01"
           * triggering this thread to continue processing the encrypt command
@@ -120,7 +141,6 @@ class serverListener extends Thread{
           * the server will then forward the message onto the recipient
           * the server will respond with a success message ending the command
           */
-        }else if(fromServer.toUpperCase().equals("-PKEY01")){
           clientpkey recipPkey = (clientpkey) this.in.readObject();
           int n = recipPkey.n;
           int e = recipPkey.e;
@@ -135,14 +155,33 @@ class serverListener extends Thread{
           //send the server the ciphertext
           this.out.writeObject(encryptedMess);
           System.out.println("Client: ciphertext sent to server");
+          /* now generate digital signature (integrity + authentication)
+          * This is done by computing the hash of the message
+          * Then encrypting the hash using the senders PRIVATE key
+          * the reciever then decrypts the digital signature using the senders PUBLIC key
+          *    this authenticates the sender as only the sender has that private key
+          * the reciever computes a hash of the recieved message and compares it to the recieved digital signature
+          * if they match then the integrity of the message can be ensured (the message wasnt tampered with
+          * during transit across the unsage network)
+          */
+          String digSig = client.getSHA256Hash(this.encryptedMessage);
+          //intitialise a Sender object with the senders PRIVATE key
+          //Encrypt the digital signature with the senders private key
+          //Operation performed C == M^d mod n
+          Sender digSigSender = new Sender(this.rcvr.getN(),this.rcvr.getPrivateKey());
+          BigInteger[] encryptedDigSig = digSigSender.encryptString(digSig);
+          //send the encypted digital signature to the server
+          this.out.writeObject(encryptedDigSig);
+          System.out.println("Client: digital signature encrypted, generated and sent to server\n" + digSig);
 
-         /* encrypt command continuation (Reciever)
+        }else if(fromServer.toUpperCase().equals("-ENCRYPTEDMSG01")){
+          /* encrypt command continuation (Reciever)
           * the server has sent the message to the client "-ENCRYPTEDMSG01"
           * triggering this thread to decrypt recieved ciphertext on the recipient client
           * Decrypt the recieved ciphertext with the clients private key
           */
-        }else if(fromServer.toUpperCase().equals("-ENCRYPTEDMSG01")){
           BigInteger[] ciphertext = (BigInteger[]) this.in.readObject();
+          BigInteger[] recDigSig = (BigInteger[]) this.in.readObject();
           clientpkey senderData = (clientpkey) this.in.readObject();
           String senderInfo = "(Username:"+senderData.username+",id:"+senderData.id+")";
           System.out.print("Client: Recieved ciphertext: ");
@@ -151,7 +190,25 @@ class serverListener extends Thread{
           }
           System.out.println(" from " + senderInfo);
           String message = rcvr.decryptString(ciphertext);
-          System.out.println("Client: Decrypted ciphertext (from "+senderInfo+") into message:\n-->:" + message);
+          System.out.println("Client: Decrypted ciphertext (from "+senderInfo+") into message:\n-->: " + message);
+          //decrypt the recieved digital signature
+          /*  The recieved digital signature is encrypted with the senders private key
+           *  To decrypt use the senders public key, stored in sender data
+           */
+          Reciever digSigReciever = new Reciever(senderData.n,senderData.e);
+          //operation performed M == C^e mod n 
+          String decryptedSig = digSigReciever.decryptString(recDigSig);
+          System.out.println("\tDecrypted recieved digital signature: " +decryptedSig);
+          if(decryptedSig.equals(client.getSHA256Hash(message))){
+            System.out.println("\tClient: " + ConsoleColours.GREEN +
+            "Digital signature analysis: message integrity verified and sender authenticated" +
+            ConsoleColours.RESET);
+          }else{
+            System.out.println("\tClient: " + ConsoleColours.RED +
+            "Digital signature analysis: message integrity and sender authentication could not be verified " +
+            ",the message may have been tampered with during transit across network or sender may be an imposter" +
+            ConsoleColours.RESET);
+          }
         }else{
           System.out.println("Server: " + fromServer);
         }

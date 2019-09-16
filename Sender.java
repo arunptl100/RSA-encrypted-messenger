@@ -20,7 +20,7 @@ public class Sender{
   public BigInteger encrypt(BigInteger Message){
     //Ciphertext == M^e mod n
     //Ciphertext can be large so use BigInteger
-    // System.out.println("Encrypting Message " + Message + " with public key " + this.n_pubKey
+    //System.out.println("Encrypting Message " + Message + " with public key " + this.n_pubKey
     // + " --> " + Message + "^" + this.e_pubKey + " mod " + this.n_pubKey );
     return ((Message).pow(this.e_pubKey)).mod(BigInteger.valueOf(this.n_pubKey));
   }

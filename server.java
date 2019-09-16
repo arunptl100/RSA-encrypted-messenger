@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public class server{
   //data structure for storing connected clients
-  static LinkedList<KeyValuePair<Integer,clientHandler>> clientList;
+  volatile static LinkedList<KeyValuePair<Integer,clientHandler>> clientList;
 
   /*method returning a string of connected clients usernames and respective ids
   */
