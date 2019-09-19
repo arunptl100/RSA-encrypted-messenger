@@ -5,8 +5,8 @@ import java.util.*;
 public class RSA{
 
   /* Function that returns the gcd of 2 ints
-  * source: https://www.java67.com/2012/08/java-program-to-find-gcd-of-two-numbers.html
-  */
+   * source: https://www.java67.com/2012/08/java-program-to-find-gcd-of-two-numbers.html
+   */
   private static int findGCD(int number1, int number2) {
     //base case
     if(number2 == 0){
@@ -115,6 +115,7 @@ public class RSA{
     // BigInteger decryptMess = rcvr.decrypt(cipherT);
     //System.out.println("Result of Decryption " + decryptMess);
     System.out.println("===================================================================");
+    sin.close();
     System.exit(0);
   }
 }
