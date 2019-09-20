@@ -3,6 +3,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class RSA{
+  private static final int port = 25565;
+  private static final String host = "localhost";
 
   /* Function that returns the gcd of 2 ints
    * source: https://www.java67.com/2012/08/java-program-to-find-gcd-of-two-numbers.html
@@ -28,17 +30,17 @@ public class RSA{
    *  https://www.javatpoint.com/prime-number-program-in-java
    */
   public static boolean checkPrime(int n){
-    int i,m=0,flag=0;
-    m=n/2;
-    if(n==0||n==1){
+    int i, m=0, flag=0;
+    m = n/2;
+    if(n==0 || n==1){
       return false;
     }else{
-      for(i=2;i<=m;i++){
-        if(n%i==0){
+      for(i=2; i<=m; i++){
+        if(n%i == 0){
           return false;
         }
       }
-      if(flag==0)  { return true; }
+      if(flag == 0){ return true; }
     }
     return false;
   }
@@ -82,7 +84,7 @@ public class RSA{
       e = Integer.parseInt(sin.nextLine());
     }
 
-    client cl = new client("localhost",25565, p, q, e);
+    client cl = new client(host, port, p, q, e);
 
 
     // Reciever rc = new Reciever(p,q,e);
