@@ -15,9 +15,9 @@ If a user decides to encrypt their message, digital signatures will automaticall
 ## Quickstart guide
 1. Start `server.java` on a host machine
 2. Configure `client.java` to connect to the server running on the host machine by altering the values on
-__lines 6 and 7__ in `RSA.java`. By default `client.java` is set to connect to a server instance running `localhost`
+__lines 6 and 7__ in `RSA.java`. By default `RSA.java` is set to connect to a server instance running on `localhost`
 port 25565
-3. Run instances of `client.java` for each user.
+3. Run instances of `RSA.java` for each user.
 4. Initially, you will need to setup values for public key pair (n,e). You will be prompted for values for n , p and e. Details for the conditions of these values are provided in the program and examples are provided below:
 ```
 p = 97 , q = 101 , e = 251
