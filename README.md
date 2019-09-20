@@ -4,12 +4,12 @@ Initially, the aim of this project was to implement the RSA encryption scheme. C
 
 ## Features
 
-* Instant messaging
+# Instant messaging
 Users can send plaintext messages to other users connected to the running central server (`server.java`)
-* Encrypted messaging
+# Encrypted messaging
 Users have the option of encrypting their messages (RSA encryption scheme). Ciphertext is generated clientside
 and delivered to the recipient by the central server.
-* Digital Signatures
+# Digital Signatures
 If a user decides to encrypt their message, digital signatures will automatically used to enforce the integrity of the message during transit across the network. It also provides a means of authentication for the recipient; the recipient can authenticate the sender, if they can decrypt the digital signature with the senders public key.
 
 ### Quickstart guide
@@ -21,7 +21,7 @@ port 25565
 4. Initially, you will need to setup values for public key pair (n,e). You will be prompted for values for n , p and e. Details for the conditions of these values are provided in the program and examples are provided below:
 *  p = 97 , q = 101 , e = 251
 *  p = 11 , q = 13 , e = 23
-Clients (`client.java`) are configured to connect
+*  p and q must be large prime numbers. e must be relatively prime to p , q and (p-1)\*(q-1); 1 < e < (p-1)\*(q-1)
 
 ```
 Give examples

@@ -76,10 +76,10 @@ public class RSA{
       q = Integer.parseInt(sin.nextLine());
     }
 
-    while( !((relativelyPrime(e,(p-1))) && (relativelyPrime(e, (q-1)))
+    while( !((relativelyPrime(e,(p))) && (relativelyPrime(e, (q)))
     && (e > 1) && (e < (p-1)*(q-1)) && (relativelyPrime(e,((p-1)*(q-1))))) ){
       System.out.println("Enter public key (e)"+
-      "\ne must be relatively prime to ("+(p-1)+") and ("+(q-1)+") and "+((p-1)*(q-1))+
+      "\ne must be relatively prime to "+(p)+" and "+q+" and "+((p-1)*(q-1))+
       " . 1 < e < "+((p-1)*(q-1))+")");
       e = Integer.parseInt(sin.nextLine());
     }
